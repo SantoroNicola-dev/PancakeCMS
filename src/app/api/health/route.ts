@@ -1,0 +1,30 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
+
+export async function GET() {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    return NextResponse.json(
+      {
+        status: "ok",
+        service: "pancakecms",
+        database: "connected",
+        timestamp: new Date().toISOString(),
+      },
+      { status: 200 }
+    );
+  } catch (err) {
+    console.error("Healthcheck DB error:", err);
+    return NextResponse.json(
+      {
+        status: "error",
+        service: "pancakecms",
+        database: "disconnected",
+      },
+      { status: 503 }
+    );
+  }
+}
+
