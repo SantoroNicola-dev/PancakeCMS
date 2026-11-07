@@ -169,6 +169,7 @@ model Media {
   caption      String   @default("")
   focalPointX  Float    @default(50)
   focalPointY  Float    @default(50)
+  fileData     Bytes?   // Binary backup in PostgreSQL so uploads survive container rebuilds
   uploadedById String?
   uploadedBy   User?    @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
   createdAt    DateTime @default(now())

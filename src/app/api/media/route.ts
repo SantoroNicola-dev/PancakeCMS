@@ -6,6 +6,8 @@ import sharp from "sharp";
 import fs from "fs/promises";
 import path from "path";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const folder = searchParams.get("folder");
@@ -26,11 +28,28 @@ export async function GET(req: NextRequest) {
   const [mediaList, allPosts] = await Promise.all([
     prisma.media.findMany({
       where,
-      include: {
-        uploadedBy: { select: { id: true, name: true } },
-      },
-      orderBy: { createdAt: "desc" },
-    }),
+        select: {
+          id: true,
+          filename: true,
+          originalName: true,
+          url: true,
+          folder: true,
+          mimeType: true,
+          sizeBytes: true,
+          width: true,
+          height: true,
+          altText: true,
+          title: true,
+          caption: true,
+          focalPointX: true,
+          focalPointY: true,
+          uploadedById: true,
+          createdAt: true,
+          updatedAt: true,
+          uploadedBy: { select: { id: true, name: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      }),
     prisma.post.findMany({
       select: { id: true, title: true, coverImage: true, content: true },
     }),
@@ -83,14 +102,24 @@ export async function POST(req: NextRequest) {
     const outputPath = path.join(uploadsDir, filename);
 
     // Ottimizzazione automatica WebP + ridimensionamento max 1920px con Sharp
-    const processedBuffer = await sharp(inputBuffer)
-      .rotate()
-      .resize({ width: 1920, withoutEnlargement: true })
-      .webp({ quality: 86 })
-      .toBuffer();
+    let processedBuffer: Buffer;
+    let width: number | null = null;
+    let height: number | null = null;
+
+    try {
+      processedBuffer = await sharp(inputBuffer, { animated: false })
+        .rotate()
+        .resize({ width: 1920, withoutEnlargement: true })
+        .webp({ quality: 86 })
+        .toBuffer();
+      const metadata = await sharp(processedBuffer).metadata();
+      width = metadata.width || null;
+      height = metadata.height || null;
+    } catch {
+      processedBuffer = inputBuffer;
+    }
 
     await fs.writeFile(outputPath, processedBuffer);
-    const metadata = await sharp(processedBuffer).metadata();
 
     const created = await prisma.media.create({
       data: {
@@ -100,16 +129,18 @@ export async function POST(req: NextRequest) {
         folder: folder || "Generale",
         mimeType: "image/webp",
         sizeBytes: processedBuffer.length,
-        width: metadata.width || null,
-        height: metadata.height || null,
+        width,
+        height,
         altText: altText || baseName.replace(/-/g, " "),
         title: title || baseName.replace(/-/g, " "),
         caption,
+        fileData: processedBuffer,
         uploadedById: user.id,
       },
     });
 
-    return NextResponse.json({ media: created });
+    const { fileData: _omit, ...mediaWithoutBinary } = created;
+    return NextResponse.json({ media: mediaWithoutBinary });
   } catch (err) {
     console.error("Media upload error:", err);
     return NextResponse.json(
@@ -118,4 +149,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

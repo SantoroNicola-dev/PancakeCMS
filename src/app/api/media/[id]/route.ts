@@ -22,7 +22,7 @@ export async function PUT(
   try {
     const body = await req.json();
 
-    // 1. Se viene inviata un'immagine modificata dall'Editor Immagini In-Browser (dataUrl base64 o parametri Sharp)
+    // 1. Se viene inviata un'immagine modificata dall'Editor Immagini In-Browser (dataUrl base64)
     if (body.editedDataUrl) {
       const base64Data = String(body.editedDataUrl).replace(
         /^data:image\/\w+;base64,/,
@@ -49,9 +49,11 @@ export async function PUT(
             height: meta.height || existing.height,
             altText: body.altText ?? existing.altText,
             title: body.title ?? existing.title,
+            fileData: webpBuffer,
           },
         });
-        return NextResponse.json({ media: updated });
+        const { fileData: _omit, ...rest } = updated;
+        return NextResponse.json({ media: rest });
       } else {
         const newFilename = `${path.parse(existing.filename).name}-edit-${Date.now()
           .toString()
@@ -72,10 +74,12 @@ export async function PUT(
             altText: body.altText ?? existing.altText,
             title: `${existing.title || existing.filename} (Modificata)`,
             caption: existing.caption,
+            fileData: webpBuffer,
             uploadedById: user.id,
           },
         });
-        return NextResponse.json({ media: createdCopy });
+        const { fileData: _omit, ...rest } = createdCopy;
+        return NextResponse.json({ media: rest });
       }
     }
 
@@ -98,7 +102,8 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json({ media: updated });
+    const { fileData: _omit, ...rest } = updated;
+    return NextResponse.json({ media: rest });
   } catch (err) {
     console.error("Update media error:", err);
     return NextResponse.json(
@@ -124,7 +129,7 @@ export async function DELETE(
 
   try {
     const filePath = path.join(process.cwd(), "public", "uploads", existing.filename);
-    await fs.unlink(filePath).catch(() => {});
+    await fs.unlink(filePath).catch(() => { });
     await prisma.media.delete({ where: { id: existing.id } });
     return NextResponse.json({ success: true });
   } catch (err) {
@@ -135,4 +140,3 @@ export async function DELETE(
     );
   }
 }
-

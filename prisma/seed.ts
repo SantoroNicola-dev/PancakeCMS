@@ -117,6 +117,7 @@ async function generateDemoImages(uploadsDir: string) {
       altText: item.altText,
       title: item.title,
       caption: item.caption,
+      fileData: buffer,
     });
   }
 

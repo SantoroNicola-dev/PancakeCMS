@@ -8,6 +8,10 @@ export default async function CatchAllRedirectPage({
 }: {
   params: { legacyPath: string[] };
 }) {
+  if (params.legacyPath?.[0] === "uploads") {
+    redirect("/api/" + params.legacyPath.join("/"));
+  }
+
   const pathStr = "/" + (params.legacyPath || []).join("/");
 
   const rule = await prisma.redirect.findUnique({
