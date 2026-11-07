@@ -12,6 +12,7 @@ RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+RUN mkdir -p /app/public/uploads
 # Dummy DATABASE_URL per consentire il completamento di `next build` su Coolify
 # anche quando il DB reale viene iniettato solo a runtime
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy?schema=public"

@@ -3,6 +3,8 @@ import "./globals.css";
 import { prisma } from "@/lib/prisma";
 import { GoogleAnalyticsAndConsent } from "@/components/analytics/GoogleAnalyticsAndConsent";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await prisma.siteSettings
     .findUnique({ where: { id: "default" } })
