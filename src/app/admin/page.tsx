@@ -14,6 +14,7 @@ import {
   Image as ImageIcon,
   Mail,
   MessageSquare,
+  Palette,
   ShieldCheck,
   Sparkles,
   Users,
@@ -86,6 +87,14 @@ export default async function AdminDashboardPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
+          {user?.role === "ADMIN" && (
+            <Link
+              href="/admin/appearance"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-brand-200 bg-brand-50 px-3.5 py-2 text-xs font-semibold text-brand-700 hover:bg-brand-100 dark:border-brand-900 dark:bg-brand-950/60 dark:text-brand-300"
+            >
+              <Palette className="h-4 w-4 text-brand-600" /> Aspetto, Tema &amp; Design 360°
+            </Link>
+          )}
           <Link
             href="/admin/media"
             className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"

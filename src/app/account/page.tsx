@@ -65,6 +65,7 @@ export default async function AccountPage() {
         logoText={settings?.logoText || "Sara."}
         headerMenu={headerMenu}
         currentUser={user}
+        settings={settings}
       />
 
       <main className="flex-1">
@@ -85,6 +86,7 @@ export default async function AccountPage() {
         siteName={settings?.siteName || "Il Blog di Sara"}
         siteTagline={settings?.siteTagline || ""}
         footerMenu={footerMenu}
+        settings={settings}
       />
     </div>
   );

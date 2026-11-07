@@ -55,6 +55,7 @@ export default async function TagArchivePage({
         logoText={settings?.logoText || "Sara."}
         headerMenu={headerMenu}
         currentUser={user}
+        settings={settings}
       />
 
       <main className="mx-auto flex-1 w-full max-w-6xl px-4 pt-8 sm:px-6">
@@ -121,6 +122,7 @@ export default async function TagArchivePage({
         siteName={settings?.siteName || "Il Blog di Sara"}
         siteTagline={settings?.siteTagline || ""}
         footerMenu={footerMenu}
+        settings={settings}
       />
     </div>
   );

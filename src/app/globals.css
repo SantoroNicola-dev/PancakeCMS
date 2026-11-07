@@ -6,10 +6,24 @@
   :root {
     --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --font-serif: "Georgia", "Cambria", "Times New Roman", Times, serif;
+    --brand-50: 253 244 243;
+    --brand-100: 251 232 230;
+    --brand-200: 247 213 209;
+    --brand-300: 240 183 176;
+    --brand-400: 230 141 130;
+    --brand-500: 217 103 89;
+    --brand-600: 197 76 61;
+    --brand-700: 165 60 47;
+    --brand-800: 137 53 43;
+    --brand-900: 114 49 41;
+    --brand-950: 66 22 17;
+    --accent-500: 51 65 85;
+    --accent-600: 30 41 59;
+    --accent-700: 15 23 42;
   }
 
   body {
-    @apply bg-white text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
+    @apply bg-white text-slate-900 antialiased font-sans dark:bg-slate-950 dark:text-slate-100;
   }
 }
 
@@ -17,39 +31,51 @@
 .prose h1 {
   @apply font-serif text-3xl font-bold tracking-tight text-slate-900 dark:text-white mt-8 mb-4;
 }
+
 .prose h2 {
   @apply font-serif text-2xl font-bold tracking-tight text-slate-900 dark:text-white mt-8 mb-3 scroll-mt-24;
 }
+
 .prose h3 {
   @apply font-serif text-xl font-semibold text-slate-900 dark:text-white mt-6 mb-2 scroll-mt-24;
 }
+
 .prose p {
   @apply my-4 leading-relaxed text-slate-700 dark:text-slate-300 text-[17px];
 }
+
 .prose ul {
   @apply my-4 list-disc pl-6 space-y-1.5 text-slate-700 dark:text-slate-300;
 }
+
 .prose ol {
   @apply my-4 list-decimal pl-6 space-y-1.5 text-slate-700 dark:text-slate-300;
 }
+
 .prose blockquote {
   @apply my-6 border-l-4 border-brand-500 bg-brand-50/50 dark:bg-brand-950/30 py-3 px-5 italic rounded-r-xl text-slate-800 dark:text-slate-200;
 }
+
 .prose pre {
   @apply my-5 overflow-x-auto rounded-xl bg-slate-900 p-4 text-xs text-slate-100;
 }
+
 .prose img {
   @apply my-6 rounded-2xl shadow-md max-w-full h-auto mx-auto;
 }
+
 .prose table {
   @apply my-6 w-full border-collapse overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 text-sm;
 }
+
 .prose th {
   @apply border border-slate-200 bg-slate-100 px-3 py-2 text-left font-semibold dark:border-slate-800 dark:bg-slate-900;
 }
+
 .prose td {
   @apply border border-slate-200 px-3 py-2 dark:border-slate-800;
 }
+
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
@@ -57,4 +83,3 @@
   pointer-events: none;
   height: 0;
 }
-

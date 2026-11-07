@@ -14,6 +14,7 @@ import {
   LayoutDashboard,
   LogOut,
   MessageSquare,
+  Palette,
   Settings,
   ShieldCheck,
   Users,
@@ -74,6 +75,12 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
       label: "Utenti, Lettori & 2FA",
       href: "/admin/users",
       icon: Users,
+      roles: ["ADMIN"],
+    },
+    {
+      label: "Aspetto, Tema & Design 360°",
+      href: "/admin/appearance",
+      icon: Palette,
       roles: ["ADMIN"],
     },
     {

@@ -7,8 +7,14 @@ import { getSessionUser } from "@/lib/auth";
 import { Navbar } from "@/components/blog/Navbar";
 import { Footer } from "@/components/blog/Footer";
 import { PostInteractionsAndComments } from "@/components/blog/PostInteractionsAndComments";
+import { ReadingProgressBar } from "@/components/blog/ReadingProgressBar";
 import { extractTocAndInjectIds, formatDateIt } from "@/lib/utils";
 import { buildArticleJsonLd } from "@/lib/seo-analyzer";
+import {
+  getArticleWidthClass,
+  getButtonRadiusClass,
+  getCardStyleClasses,
+} from "@/lib/theme";
 import { ArrowLeft, BookOpen, Calendar, Clock, Edit3, List } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -85,13 +91,13 @@ export default async function SingleArticlePage({
   const [userLike, userBookmark, relatedPosts] = await Promise.all([
     user
       ? prisma.postLike.findUnique({
-          where: { postId_userId: { postId: post.id, userId: user.id } },
-        })
+        where: { postId_userId: { postId: post.id, userId: user.id } },
+      })
       : null,
     user
       ? prisma.bookmark.findUnique({
-          where: { postId_userId: { postId: post.id, userId: user.id } },
-        })
+        where: { postId_userId: { postId: post.id, userId: user.id } },
+      })
       : null,
     prisma.post.findMany({
       where: {
@@ -140,91 +146,112 @@ export default async function SingleArticlePage({
     }
   })();
 
+  const s = settings || ({} as Record<string, any>);
+  const articleWidthClass = getArticleWidthClass(s.articleWidth);
+  const articleHeaderStyle = s.articleHeaderStyle || "classic";
+  const showReadingProgress = s.showReadingProgress ?? true;
+  const showArticleToc = s.showArticleToc ?? true;
+  const showAuthorBioCard = s.showAuthorBioCard ?? true;
+  const showRelatedPosts = s.showRelatedPosts ?? true;
+  const cardClasses = getCardStyleClasses(s.cardStyle);
+  const btnRadius = getButtonRadiusClass(s.buttonStyle);
+
   return (
     <div className="min-h-screen flex flex-col">
+      {showReadingProgress && <ReadingProgressBar />}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
       <Navbar
-        siteName={settings?.siteName || "Il Blog di Sara"}
-        logoText={settings?.logoText || "Sara."}
+        siteName={s.siteName || "Il Blog di Sara"}
+        logoText={s.logoText || "Sara."}
         headerMenu={headerMenu}
         currentUser={user}
+        settings={s}
       />
 
-      <main className="mx-auto flex-1 w-full max-w-4xl px-4 pt-8 sm:px-6">
-        {/* Top Bar & Edit Link for Staff */}
-        <div className="mb-6 flex items-center justify-between">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-brand-600"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> Torna al magazine
-          </Link>
-
-          {isStaff && (
+        <main className={`mx-auto flex-1 w-full ${articleWidthClass} px-4 pt-8 sm:px-6`}>
+          {/* Top Bar & Edit Link for Staff */}
+          <div className="mb-6 flex items-center justify-between">
             <Link
-              href={`/admin/posts/${post.id}`}
-              className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 dark:bg-white dark:text-slate-900"
+              href="/"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-brand-600"
             >
-              <Edit3 className="h-3.5 w-3.5" /> Modifica nell&apos;Editor CMS
+              <ArrowLeft className="h-3.5 w-3.5" /> Torna al magazine
             </Link>
-          )}
-        </div>
 
-        {/* Article Header */}
-        <article>
-          <header className="space-y-4">
-            <div className="flex flex-wrap items-center gap-3 text-xs">
-              {post.category && (
-                <Link
-                  href={`/categoria/${post.category.slug}`}
-                  className="rounded-full bg-brand-100 px-3 py-1 font-bold uppercase tracking-wider text-brand-700 dark:bg-brand-950 dark:text-brand-300"
-                >
-                  {post.category.name}
-                </Link>
-              )}
-              <span className="inline-flex items-center gap-1 text-slate-500">
-                <Calendar className="h-3.5 w-3.5" />{" "}
-                {formatDateIt(post.publishedAt || post.createdAt)}
-              </span>
-              <span className="inline-flex items-center gap-1 text-slate-500">
-                <Clock className="h-3.5 w-3.5" /> {post.readingTimeMin} min di
-                lettura
-              </span>
-            </div>
-
-            <h1 className="font-serif text-3xl font-bold leading-tight text-slate-900 sm:text-4xl md:text-5xl dark:text-white">
-              {post.title}
-            </h1>
-
-            {post.excerpt && (
-              <p className="text-lg leading-relaxed text-slate-600 dark:text-slate-300">
-                {post.excerpt}
-              </p>
+            {isStaff && (
+              <Link
+                href={`/admin/posts/${post.id}`}
+                className={`inline-flex items-center gap-1.5 ${btnRadius} bg-slate-900 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 dark:bg-white dark:text-slate-900`}
+              >
+                <Edit3 className="h-3.5 w-3.5" /> Modifica nell&apos;Editor CMS
+              </Link>
             )}
+          </div>
 
-            {/* Author Byline */}
-            <div className="flex items-center gap-3 border-y border-slate-200 py-4 dark:border-slate-800">
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-100 font-serif text-sm font-bold text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-                {post.author.name.slice(0, 2).toUpperCase()}
-              </div>
-              <div>
-                <p className="text-sm font-bold text-slate-900 dark:text-white">
-                  {post.author.name}
-                </p>
-                <p className="text-xs text-slate-500">
-                  {post.author.jobTitle || "Autore Redazione"}
-                </p>
-              </div>
-            </div>
-          </header>
+          {/* Article Header */}
+          <article>
+                <header
+                  className={`space-y-4 ${articleHeaderStyle === "centered" ? "text-center" : ""
+                    }`}
+                >
+                  <div
+                    className={`flex flex-wrap items-center gap-3 text-xs ${articleHeaderStyle === "centered" ? "justify-center" : ""
+                      }`}
+                  >
+                    {post.category && (
+                      <Link
+                        href={`/categoria/${post.category.slug}`}
+                        className={`${btnRadius} bg-brand-100 px-3 py-1 font-bold uppercase tracking-wider text-brand-700 dark:bg-brand-950 dark:text-brand-300`}
+                      >
+                        {post.category.name}
+                      </Link>
+                    )}
+                    <span className="inline-flex items-center gap-1 text-slate-500">
+                      <Calendar className="h-3.5 w-3.5" />{" "}
+                      {formatDateIt(post.publishedAt || post.createdAt)}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-slate-500">
+                      <Clock className="h-3.5 w-3.5" /> {post.readingTimeMin} min di
+                      lettura
+                    </span>
+                  </div>
 
-          {/* Cover Image */}
-          {post.coverImage && (
-            <figure className="my-8 overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800">
+                  <h1 className="font-serif text-3xl font-bold leading-tight text-slate-900 sm:text-4xl md:text-5xl dark:text-white">
+                    {post.title}
+                  </h1>
+
+                  {post.excerpt && (
+                    <p className="text-lg leading-relaxed text-slate-600 dark:text-slate-300">
+                      {post.excerpt}
+                    </p>
+                  )}
+
+                  {/* Author Byline */}
+                    <div
+                      className={`flex items-center gap-3 border-y border-slate-200 py-4 dark:border-slate-800 ${articleHeaderStyle === "centered" ? "justify-center text-left" : ""
+                        }`}
+                    >
+                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-100 font-serif text-sm font-bold text-brand-700 dark:bg-brand-950 dark:text-brand-300">
+                        {post.author.name.slice(0, 2).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white">
+                          {post.author.name}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {post.author.jobTitle || "Autore Redazione"}
+                        </p>
+                      </div>
+                    </div>
+                </header>
+
+                {/* Cover Image */}
+                {post.coverImage && (
+            <figure className="cms-hero-card my-8 overflow-hidden border border-slate-200 dark:border-slate-800">
               <img
                 src={post.coverImage}
                 alt={post.coverImageAlt || post.title}
@@ -239,10 +266,10 @@ export default async function SingleArticlePage({
           )}
 
           {/* Automatic Table of Contents (TOC) */}
-          {toc.length >= 2 && (
+          {showArticleToc && toc.length >= 2 && (
             <nav
               aria-label="Indice dell'articolo"
-              className="my-8 rounded-2xl border border-slate-200 bg-slate-50/80 p-5 dark:border-slate-800 dark:bg-slate-900/70"
+              className={`my-8 p-5 ${cardClasses}`}
             >
               <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
                 <List className="h-4 w-4 text-brand-600" /> Indice dei Contenuti
@@ -281,7 +308,7 @@ export default async function SingleArticlePage({
                 <Link
                   key={tag.id}
                   href={`/tag/${tag.slug}`}
-                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 hover:border-brand-500 hover:text-brand-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                  className={`${btnRadius} border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 hover:border-brand-500 hover:text-brand-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300`}
                 >
                   #{tag.name}
                 </Link>
@@ -290,24 +317,26 @@ export default async function SingleArticlePage({
           )}
 
           {/* Author Bio Card */}
-          <div className="mt-10 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-6 sm:flex-row sm:items-center dark:border-slate-800 dark:bg-slate-900">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand-600 font-serif text-lg font-bold text-white">
-              {post.author.name.slice(0, 2).toUpperCase()}
+          {showAuthorBioCard && (
+            <div className={`mt-10 flex flex-col gap-4 p-6 sm:flex-row sm:items-center ${cardClasses}`}>
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand-600 font-serif text-lg font-bold text-white">
+                {post.author.name.slice(0, 2).toUpperCase()}
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-brand-600">
+                  Scritto da {post.author.name}
+                </p>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                  {post.author.bio ||
+                    "Autore e curatore editoriale per Il Blog di Sara."}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-brand-600">
-                Scritto da {post.author.name}
-              </p>
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                {post.author.bio ||
-                  "Autore e curatore editoriale per Il Blog di Sara."}
-              </p>
-            </div>
-          </div>
+          )}
         </article>
 
         {/* Related Articles */}
-        {relatedPosts.length > 0 && (
+        {showRelatedPosts && relatedPosts.length > 0 && (
           <section className="mt-12 border-t border-slate-200 pt-8 dark:border-slate-800">
             <h3 className="flex items-center gap-2 font-serif text-xl font-bold text-slate-900 dark:text-white">
               <BookOpen className="h-5 w-5 text-brand-600" /> Articoli Correlati
@@ -317,7 +346,7 @@ export default async function SingleArticlePage({
                 <Link
                   key={rp.id}
                   href={`/articolo/${rp.slug}`}
-                  className="group rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-brand-500 dark:border-slate-800 dark:bg-slate-900"
+                  className={`group p-4 ${cardClasses} hover:border-brand-500`}
                 >
                   <h4 className="font-serif text-sm font-bold text-slate-900 group-hover:text-brand-600 dark:text-white">
                     {rp.title}
@@ -345,11 +374,12 @@ export default async function SingleArticlePage({
       </main>
 
       <Footer
-        siteName={settings?.siteName || "Il Blog di Sara"}
-        siteTagline={settings?.siteTagline || ""}
+        siteName={s.siteName || "Il Blog di Sara"}
+        siteTagline={s.siteTagline || ""}
         footerMenu={footerMenu}
+        settings={s}
       />
     </div>
-  );
+              );
 }
 

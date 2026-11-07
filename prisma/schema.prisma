@@ -243,12 +243,92 @@ model SiteSettings {
   siteTagline             String   @default("Storie, riflessioni, design e cultura digitale raccontati con cura editoriale.")
   siteDescription         String   @default("Un magazine indipendente dedicato a creatività, scrittura, lifestyle consapevole e cultura contemporanea.")
   siteUrl                 String   @default("http://localhost:3000")
+  // Identità Visiva, Loghi & Brand
   logoText                String   @default("Sara.")
+  logoType                String   @default("text") // "text" | "image" | "both"
+  logoImageUrl            String   @default("")
+  logoDarkImageUrl        String   @default("")
+  logoHeight              Int      @default(36)
+  faviconUrl              String   @default("")
+  showSiteNameInNavbar    Boolean  @default(true)
+  mastheadBadge           String   @default("Magazine Indipendente")
+  showMasthead            Boolean  @default(true)
+
+  // Tema, Palette Colori & Superfici (Light & Dark)
+  themePreset             String   @default("terracotta")
+  defaultThemeMode        String   @default("system") // "system" | "light" | "dark"
+  allowThemeToggle        Boolean  @default(true)
   primaryColor            String   @default("#c54c3d")
   accentColor             String   @default("#1e293b")
-  fontPairing             String   @default("editorial") // editorial, modern, classic
-  heroLayout              String   @default("magazine")  // magazine, spotlight, minimal
+  bgLightColor            String   @default("#ffffff")
+  surfaceLightColor       String   @default("#ffffff")
+  textLightColor          String   @default("#0f172a")
+  bgDarkColor             String   @default("#020617")
+  surfaceDarkColor        String   @default("#0f172a")
+  textDarkColor           String   @default("#f1f5f9")
+
+  // Tipografia & Stile Testo
+  fontPairing             String   @default("editorial") // legacy compatibility
+  headingFont             String   @default("Georgia")
+  bodyFont                String   @default("Inter")
+  baseFontSize            Int      @default(16)
+  articleLineHeight       String   @default("relaxed") // "compact" | "relaxed" | "loose"
+  headingTracking         String   @default("tight")   // "tighter" | "tight" | "normal" | "wide"
+
+  // Layout Globale, Header, Home & Sidebar
+  navbarStyle             String   @default("classic")  // "classic" | "centered" | "minimal" | "floating"
+  stickyNavbar            Boolean  @default(true)
+  containerWidth          String   @default("standard") // "compact" | "standard" | "wide"
+  heroLayout              String   @default("magazine") // "magazine" | "spotlight" | "minimal" | "dual" | "none"
+  postsGridLayout         String   @default("grid-2")   // "grid-2" | "grid-3" | "list" | "magazine-mix"
   postsPerPage            Int      @default(9)
+  sidebarPosition         String   @default("right")    // "right" | "left" | "none"
+  showCategoryBar         Boolean  @default(true)
+  showMostReadWidget      Boolean  @default(true)
+  showTagsWidget          Boolean  @default(true)
+  showAuthorWidget        Boolean  @default(true)
+  authorWidgetTitle       String   @default("Chi scrive qui")
+  authorWidgetBio         String   @default("Uno spazio indipendente dedicato a scrittura digitale, cultura visiva e slow living.")
+  authorWidgetImage       String   @default("")
+
+  // Stile Card, Bordi & Componenti UI
+  borderRadiusStyle       String   @default("rounded")  // "sharp" | "subtle" | "rounded" | "pill"
+  cardStyle               String   @default("bordered") // "bordered" | "elevated" | "flat" | "glass"
+  cardImageRatio          String   @default("video")    // "video" | "classic" | "square" | "portrait"
+  showCardExcerpt         Boolean  @default(true)
+  showCardAuthor          Boolean  @default(true)
+  showCardDate            Boolean  @default(true)
+  showCardCategory        Boolean  @default(true)
+  showCardStats           Boolean  @default(true)
+  buttonStyle             String   @default("pill")     // "sharp" | "rounded" | "pill"
+
+  // Layout Pagina Singolo Articolo
+  articleWidth            String   @default("normal")   // "narrow" | "normal" | "wide"
+  articleHeaderStyle      String   @default("classic")  // "classic" | "centered" | "cover-overlay"
+  showReadingProgress     Boolean  @default(true)
+  showArticleToc          Boolean  @default(true)
+  showAuthorBioCard       Boolean  @default(true)
+  showRelatedPosts        Boolean  @default(true)
+
+  // Top Announcement Bar
+  enableAnnouncementBar   Boolean  @default(false)
+  announcementText        String   @default("✨ Nuovo numero della newsletter disponibile ogni venerdì!")
+  announcementLinkText    String   @default("Iscriviti ora")
+  announcementLinkUrl     String   @default("#newsletter")
+  announcementBgColor     String   @default("#c54c3d")
+  announcementTextColor   String   @default("#ffffff")
+
+  // Footer & Newsletter Box
+  footerStyle             String   @default("editorial") // "editorial" | "minimal" | "centered"
+  showFooterNewsletter    Boolean  @default(true)
+  newsletterBadge         String   @default("La Lettera del Venerdì")
+  newsletterTitle         String   @default("Ricevi i nuovi articoli e i consigli di lettura nella tua casella email")
+  newsletterDescription   String   @default("Zero spam, nessun algoritmo. Solo saggi curati, note di design e letture scelte una volta a settimana.")
+  newsletterButtonText    String   @default("Iscriviti gratuitamente")
+  footerCopyrightText     String   @default("Tutti i diritti riservati. Realizzato con cura editoriale.")
+
+  // CSS Personalizzato Avanzato
+  customCss               String   @default("")
 
   // SEO Globale
   defaultMetaTitleTemplate String  @default("%s | Il Blog di Sara")
